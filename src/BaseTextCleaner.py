@@ -2,13 +2,22 @@ import re
 import datetime
 
 class BaseTextCleaner:
-    def __init__(self, db):
-        self.db = db
-        self.feed_urls = db["feed_urls"]
-        self.articles = db["articles"]
-        self.feed_post = db["feed_post"]
-        self.cleaning_info = db["cleaning_info"]
+   # def __init__(self):
+        #self.db = db
+        #self.feed_urls = db["feed_urls"]
+        #self.articles = db["articles"]
+        #self.feed_post = db["feed_post"]
+       # self.cleaning_info = db["cleaning_info"]
 
+    def clean_summary(in_raw_text):
+        #remove links
+        raw_text = re.sub(r'http[s]?:\/[\/]?(?:[a-zA-Z]|[0-9]|[$-_@&+]|[!*\(\),]|)+', "", in_raw_text);
+        raw_text = re.sub(r"www(?:\.|[a-zA-Z]|[0-9]|[$-_@&+]|[!*\(\),]|)+", "", raw_text);
+        #remove symbols
+        raw_text = raw_text.replace("*", "").replace("#", "").replace("_", "")
+        #remove parenteshis
+        raw_text = raw_text.replace("!(", "").replace("![", "").replace("[", "").replace("]", "").replace("(", "").replace(")", "")
+        return raw_text
 
     def clean_1(self):
         count = 0
@@ -21,14 +30,12 @@ class BaseTextCleaner:
             raw_text = re.sub(r'\[(\w|\s|\.|\-|©|à|è|é|ò|ì|\/|,|.])*\]', "", raw_text);
 
             # raw_text = re.sub(r'\*(\w|\s|\.|\-|\'|\,)*\n', "", raw_text);
-            raw_text = re.sub(r'http[s]?:\/[\/]?(?:[a-zA-Z]|[0-9]|[$-_@&+]|[!*\(\),]|)+', "", raw_text);
-            raw_text = re.sub(r"www(?:\.|[a-zA-Z]|[0-9]|[$-_@&+]|[!*\(\),]|)+", "", raw_text);
+
             raw_text = raw_text.replace("\n", " ")
             raw_text = re.sub(r"\/(?:[a-zA-Z]|[0-9]|[$-_@&+]|[!*,])*", "", raw_text);
             raw_text = re.sub(r"([a-zA-Z]|[0-9]|\-)+\.([a-zA-Z]|[0-9]|\-)+(\?([a-zA-Z]|[0-9]|\=)+)?", "", raw_text);
             raw_text = re.sub(r"\\'", " ", raw_text);
-            raw_text = re.sub(r" +", " ", raw_text);
-            raw_text = raw_text.replace("*", "").replace("#", "").replace("_", "").replace("!(", "").replace("  ", " ")
+            raw_text = raw_text.replace("*", "").replace("#", "").replace("_", "").replace("!(", "").replace("![", "")
             raw_text = re.sub(r"[\s]+"," ", raw_text);
             clean_text = raw_text.strip()
 

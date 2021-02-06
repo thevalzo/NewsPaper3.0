@@ -9,7 +9,7 @@ import json
 import tweepy
 from cleantext import clean
 
-from BaseTextCleaner import BaseTextCleaner
+
 from Crawler import Crawler
 
 def main ():

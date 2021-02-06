@@ -8,6 +8,8 @@ nltk.download('punkt')
 from newspaper import Article
 import json
 import requests
+import re
+from BaseTextCleaner import BaseTextCleaner
 
 class Crawler:
 
@@ -17,6 +19,7 @@ class Crawler:
 
     def __init__(self, api):
         self.api = api
+       # self.cleaner = BaseTextCleaner()
   #      self.feed_urls = db["feed_urls"]
   #      self.tweet_urls = db["tweet_urls"]
   #      self.feed_post = db["feed_post"]
@@ -72,7 +75,7 @@ class Crawler:
         count_art = 0
         count_updated = 0
         for post in feed_posts.find({
-            "crawled": "N",
+            #"crawled": "N",
             "link_is_valid": "Y",
             "link": {"$exists": True}}):
             # add language in feed
@@ -97,6 +100,7 @@ class Crawler:
             if article is not None:
 
                 summary = h.handle(post['summary'])
+                summary = BaseTextCleaner.clean_summary(summary)
                 categories_temp  = [ x for x in article_link.split('/') if '' != x ]
                 categories = categories_temp[2:-1]
 
@@ -116,13 +120,14 @@ class Crawler:
                 if "authors" in post.keys():
                     feed_authors=post["authors"]
 
-
+                text = article.text.strip()
+                text = re.sub(r"[\s]+", " ", text);
 
                 article_dict = {"source": post['source'],
                             "title": post['title'].strip(),
                             "summary": summary.strip(),
                             "summary2" : article.summary,
-                            "clean1_text": article.text.strip(),
+                            "clean1_text": text,
                             "status": "clean1_text",
                             "link": article_link,
                             "feed_authors" : feed_authors,
@@ -151,7 +156,7 @@ class Crawler:
                                                   "title": post['title'].strip(),
                                                   "summary": summary.strip(),
                                                   "summary2": article.summary,
-                                                  "text": article.text.strip(),
+                                                  "clean1_text": text,
                                                   "status": "clean1_text",
                                                   "link": article_link,
                                                   "feed_authors": feed_authors,
@@ -221,7 +226,7 @@ class Crawler:
         count_art = 0
         updated_art = 0
         for tweet in tweet_collection.find({
-            "crawled": "N",
+            #"crawled": "N",
             "link_is_valid": "Y",
             "link": {"$exists": True}}):
             # add language in feed
@@ -259,13 +264,14 @@ class Crawler:
 
                     article.nlp()
 
-
+                    text = article.text.strip()
+                    text = re.sub(r"[\s]+", " ", text);
 
                     article_dict = {"source": tweet['user_name'],
                                     "user_name": tweet['user_name'],
                                     "title": article.title,
                                     "summary2": article.summary,
-                                    "clean1_text": article.text.strip(),
+                                    "clean1_text": text,
                                     "status": "clean1_text",
                                     "link": article_link,
                                     "article_authors": article.authors,
@@ -296,7 +302,7 @@ class Crawler:
                                                    "user_name": tweet['user_name'],
                                                     "title": article.title,
                                                     "summary2": article.summary,
-                                                    "clean1_text": article.text.strip(),
+                                                    "clean1_text": text,
                                                     "status": "clean1_text",
                                                     "link": article_link,
                                                     "article_authors": article.authors,
